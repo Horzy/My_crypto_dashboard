@@ -19,6 +19,7 @@ def init_db():
       id TEXT PRIMARY KEY,
       symbol TEXT,
       name TEXT,
+      image TEXT,
       price REAL,
       market_cap REAL,
       price_change_1h REAL,
@@ -39,7 +40,6 @@ def init_db():
     return conn
 
 def fetch_global_marketcap():
-    """Returns total global crypto market‐cap in USD from CoinGecko."""
     resp = requests.get(GLOBAL_URL)
     resp.raise_for_status()
     data = resp.json().get("data", {})
@@ -59,20 +59,20 @@ def fetch_top_coins():
     return resp.json()
 
 def upsert_coins(coins, total_mcap):
-    """Upserts top coins into the local SQLite DB."""
     conn = init_db()
     cur = conn.cursor()
     for c in coins:
         share = (c["market_cap"] / total_mcap * 100) if total_mcap else 0.0
         cur.execute("""
             INSERT INTO coins(
-              id, symbol, name,
+              id, symbol, name, image,
               price, market_cap,
               price_change_1h, price_change_24h,
               price_change_7d, price_change_30d,
               market_cap_share, last_updated
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
+              image=excluded.image,
               price=excluded.price,
               market_cap=excluded.market_cap,
               price_change_1h=excluded.price_change_1h,
@@ -85,6 +85,7 @@ def upsert_coins(coins, total_mcap):
             c["id"],
             c["symbol"],
             c["name"],
+            c["image"],
             c["current_price"],
             c["market_cap"],
             c.get("price_change_percentage_1h_in_currency", 0.0),
@@ -98,7 +99,6 @@ def upsert_coins(coins, total_mcap):
     conn.close()
 
 def update_btc_history():
-    """Append today’s Bitcoin price at 00:05 UTC, if not already present."""
     coins = fetch_top_coins()
     btc = next((c for c in coins if c["id"] == "bitcoin"), None)
     if not btc:
@@ -114,7 +114,6 @@ def update_btc_history():
     conn.close()
 
 def upsert_btc_today_close(price):
-    """Upsert (insert or overwrite) today's BTC price in btc_history table."""
     today = date.today().isoformat()
     conn = sqlite3.connect(DB_PATH)
     conn.execute("""
@@ -126,6 +125,5 @@ def upsert_btc_today_close(price):
     conn.close()
 
 if __name__ == "__main__":
-    # quick test of daily job
     update_btc_history()
     print("BTC history updated for", date.today().isoformat())

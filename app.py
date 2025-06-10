@@ -50,7 +50,6 @@ app = Flask(__name__, static_folder="static")
 Compress(app)
 
 def scheduled_fetch():
-    """Fetch and upsert crypto market data."""
     total = None
     try:
         total = fetch_global_marketcap()
@@ -73,7 +72,7 @@ def scheduled_fetch():
 def get_cryptos():
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
-        SELECT id, symbol, name,
+        SELECT id, symbol, name, image,
                price, market_cap,
                price_change_1h, price_change_24h,
                price_change_7d, price_change_30d,
@@ -83,18 +82,18 @@ def get_cryptos():
          LIMIT ?
     """, (PER_PAGE,)).fetchall()
     conn.close()
-    keys = ["id","symbol","name","price","market_cap",
-            "price_change_1h","price_change_24h",
-            "price_change_7d","price_change_30d",
-            "market_cap_share","last_updated"]
-    return jsonify([dict(zip(keys,row)) for row in rows])
+    keys = ["id", "symbol", "name", "image", "price", "market_cap",
+            "price_change_1h", "price_change_24h",
+            "price_change_7d", "price_change_30d",
+            "market_cap_share", "last_updated"]
+    return jsonify([dict(zip(keys, row)) for row in rows])
 
 @app.route("/api/bitcoin/history")
 def btc_history():
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("SELECT date, price FROM btc_history ORDER BY date").fetchall()
     conn.close()
-    return jsonify([{"date":r[0], "price":r[1]} for r in rows])
+    return jsonify([{"date": r[0], "price": r[1]} for r in rows])
 
 @app.route("/api/bitcoin/kpis")
 def btc_kpis():

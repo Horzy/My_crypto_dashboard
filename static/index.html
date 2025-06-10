@@ -25,6 +25,7 @@
       <thead>
         <tr>
           <th>#</th>
+          <th>Icon</th>
           <th>Name</th>
           <th>Symbol</th>
           <th>Price (USD)</th>
@@ -57,7 +58,6 @@
         <div class="card"><div class="label">% from ATH</div><div id="kpi-from-ath-pct"></div></div>
         <div class="card"><div class="label">24h Low</div><div id="kpi-low24h"></div></div>
         <div class="card"><div class="label">24h High</div><div id="kpi-high24h"></div></div>
-        
       </div>
       <div id="last-updated-container">
         <span>Last updated:</span>
@@ -67,18 +67,13 @@
 
     <!-- Single Bitcoin Chart with Timeframe Switch -->
     <div class="chart-panel">
-
-     <div class="chart-controls">
-  <span class="chart-label">Timeframe:</span>
-  <button class="tf-btn" data-tf="30"  type="button">30D</button>
-  <button class="tf-btn" data-tf="90"  type="button">90D</button>
-  <button class="tf-btn" data-tf="365" type="button">12M</button>
-  <button class="tf-btn" data-tf="3650" type="button">10Y</button>
-</div>
-
-
-
-
+      <div class="chart-controls">
+        <span class="chart-label">Timeframe:</span>
+        <button class="tf-btn" data-tf="30"  type="button">30D</button>
+        <button class="tf-btn" data-tf="90"  type="button">90D</button>
+        <button class="tf-btn" data-tf="365" type="button">12M</button>
+        <button class="tf-btn" data-tf="3650" type="button">10Y</button>
+      </div>
       <canvas id="btcChartCombined"></canvas>
     </div>
   </div>

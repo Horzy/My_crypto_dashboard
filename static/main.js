@@ -83,6 +83,9 @@ async function loadMarket() {
     return `
       <tr class="${isBTC ? 'bitcoin-row' : ''}">
         <td>${i + 1}</td>
+        <td>
+          <img src="${c.image}" alt="${c.symbol} icon" style="width:24px;height:24px;vertical-align:middle;"/>
+        </td>
         <td>${c.name}</td>
         <td>${c.symbol.toUpperCase()}</td>
         <td>$${formatPrice(c.price)}</td>

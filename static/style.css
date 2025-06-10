@@ -59,15 +59,16 @@ table {
 thead {
   background-color: #111;
 }
-/* Ensure all cells align vertically center */
+/* Compact table cells */
 thead th,
 tbody td {
   vertical-align: middle;
-  padding: 0.2rem;
+  padding: 0.08rem 0.15rem;
   border-bottom: 1px solid #333;
   white-space: nowrap;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   text-align: left;
+  height: 28px;
 }
 thead th {
   color: white;
@@ -89,7 +90,7 @@ tbody td.negative {
 .market-share-cell {
   display: flex;
   align-items: center;
-  gap: 0.5ch;
+  gap: 0.28ch; /* tighter spacing */
 }
 .market-share-cell span {
   flex: 0 0 6ch;
@@ -99,12 +100,23 @@ tbody td.negative {
   flex: 1 1 auto;
   background-color: #222;
   border-radius: 2px;
-  height: 0.8em;
+  height: 0.7em;
   overflow: hidden;
 }
 .fill {
   background-color: #FF8C00;
   height: 100%;
+}
+
+/* Compact Icon style */
+#crypto-table td img {
+  width: 18px;
+  height: 18px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #222;
+  box-shadow: 0 0 2px #000a;
 }
 
 /* Align “Last Updated” column */
