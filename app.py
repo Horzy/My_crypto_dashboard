@@ -14,7 +14,8 @@ from fetch_and_store import (
     fetch_top_coins,
     fetch_global_marketcap,
     upsert_coins,
-    update_btc_history
+    update_btc_history,
+    upsert_btc_today_close,
 )
 
 load_dotenv()
@@ -28,7 +29,7 @@ PER_PAGE    = 50
 # KPI Cache
 BTC_KPIS_CACHE = {}
 BTC_KPIS_TS    = 0
-KPIS_TTL       = 10 * 60
+KPIS_TTL       = 5 * 60  # 5 minutes
 
 # Resilient requests session
 session = requests.Session()
@@ -112,12 +113,28 @@ def btc_kpis():
       "price_change_percentage": "1h,24h,7d,30d"
     }
     try:
+        # Get basic market data from /coins/markets
         resp = session.get(API_URL, params=params)
         resp.raise_for_status()
         d = resp.json()[0]
         g = session.get(GLOBAL_URL).json().get("data", {})
         total = g.get("total_market_cap", {}).get("usd", 0)
         dom = (d["market_cap"] / total * 100) if total else 0
+
+        # Get ATH from /coins/bitcoin
+        btc_info = session.get(
+            "https://api.coingecko.com/api/v3/coins/bitcoin",
+            params={
+                "localization": "false",
+                "tickers": "false",
+                "market_data": "true",
+                "community_data": "false",
+                "developer_data": "false",
+                "sparkline": "false"
+            }
+        ).json()
+        ath = btc_info["market_data"]["ath"][VS_CURRENCY]
+
         BTC_KPIS_CACHE = {
           "price": d["current_price"],
           "change_24h": d["price_change_percentage_24h_in_currency"],
@@ -127,10 +144,17 @@ def btc_kpis():
           "dominance": dom,
           "high_24h": d["high_24h"],
           "low_24h": d["low_24h"],
-          "max_supply": 21000000
+          "max_supply": 21000000,
+          "ath": ath
         }
+        perc_from_ath = ((BTC_KPIS_CACHE["price"] - BTC_KPIS_CACHE["ath"]) / BTC_KPIS_CACHE["ath"]) * 100
+        BTC_KPIS_CACHE["from_ath_pct"] = perc_from_ath
         BTC_KPIS_TS = now
         BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(now).strftime("%Y-%m-%d %H:%M:%S")
+
+        # Upsert latest BTC close to btc_history
+        upsert_btc_today_close(d["current_price"])
+
     except Exception as e:
         app.logger.error("Error fetching KPIs", exc_info=e)
         if BTC_KPIS_CACHE:
@@ -150,7 +174,7 @@ if __name__ == "__main__":
     scheduler.add_job(
       func=scheduled_fetch,
       trigger="interval",
-      minutes=5,  # backend fetch every 5 min
+      minutes=5,
       id="crypto_fetch_job",
       max_instances=1,
       replace_existing=True

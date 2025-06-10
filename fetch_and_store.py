@@ -113,6 +113,18 @@ def update_btc_history():
     conn.commit()
     conn.close()
 
+def upsert_btc_today_close(price):
+    """Upsert (insert or overwrite) today's BTC price in btc_history table."""
+    today = date.today().isoformat()
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("""
+        INSERT INTO btc_history(date, price)
+        VALUES (?, ?)
+        ON CONFLICT(date) DO UPDATE SET price=excluded.price
+    """, (today, price))
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     # quick test of daily job
     update_btc_history()

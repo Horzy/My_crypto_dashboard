@@ -43,33 +43,44 @@
 
   <!-- Bitcoin Tab -->
   <div id="bitcoin" class="container tab-content" style="display:none;">
-    <!-- KPI Cards -->
-    <div class="kpi-cards">
-      <div class="card"><div class="label">Price</div><div id="kpi-price"></div></div>
-      <div class="card"><div class="label">24 h Change</div><div id="kpi-change"></div></div>
-      <div class="card"><div class="label">Market Cap</div><div id="kpi-mcap"></div></div>
-      <div class="card"><div class="label">24 h Volume</div><div id="kpi-vol"></div></div>
-      <div class="card"><div class="label">Dominance</div><div id="kpi-dom"></div></div>
-      <div class="card"><div class="label">Circulating Supply</div><div id="kpi-supply"></div></div>
-      <div class="card"><div class="label">Max Supply</div><div id="kpi-max-supply"></div></div>
-      <div class="card"><div class="label">Last Updated</div><div id="kpi-last-updated"></div></div>
+    <div class="kpi-wrapper">
+      <h2 class="kpi-title">Financial KPIs</h2>
+      <div class="kpi-cards">
+        <div class="card"><div class="label">Price</div><div id="kpi-price"></div></div>
+        <div class="card"><div class="label">24 h Change</div><div id="kpi-change"></div></div>
+        <div class="card"><div class="label">Market Cap</div><div id="kpi-mcap"></div></div>
+        <div class="card"><div class="label">24 h Volume</div><div id="kpi-vol"></div></div>
+        <div class="card"><div class="label">Dominance</div><div id="kpi-dom"></div></div>
+        <div class="card"><div class="label">Circulating Supply</div><div id="kpi-supply"></div></div>
+        <div class="card"><div class="label">Max Supply</div><div id="kpi-max-supply"></div></div>
+        <div class="card"><div class="label">All-Time High</div><div id="kpi-ath"></div></div>
+        <div class="card"><div class="label">% from ATH</div><div id="kpi-from-ath-pct"></div></div>
+        <div class="card"><div class="label">24h Low</div><div id="kpi-low24h"></div></div>
+        <div class="card"><div class="label">24h High</div><div id="kpi-high24h"></div></div>
+        
+      </div>
+      <div id="last-updated-container">
+        <span>Last updated:</span>
+        <span id="kpi-last-updated"></span>
+      </div>
     </div>
 
-    <!-- 30-Day Price Chart -->
-    <h2>Bitcoin: Last 30 Days Closing Price</h2>
-    <canvas id="btcChart30d"></canvas>
+    <!-- Single Bitcoin Chart with Timeframe Switch -->
+    <div class="chart-panel">
 
-    <!-- 90-Day Price Chart -->
-    <h2>Bitcoin: Last 90 Days Closing Price</h2>
-    <canvas id="btcChart90d"></canvas>
+     <div class="chart-controls">
+  <span class="chart-label">Timeframe:</span>
+  <button class="tf-btn" data-tf="30"  type="button">30D</button>
+  <button class="tf-btn" data-tf="90"  type="button">90D</button>
+  <button class="tf-btn" data-tf="365" type="button">12M</button>
+  <button class="tf-btn" data-tf="3650" type="button">10Y</button>
+</div>
 
-    <!-- 12-Month Price Chart -->
-    <h2>Bitcoin: Last 12 Months Closing Price</h2>
-    <canvas id="btcChart365d"></canvas>
 
-    <!-- 10-Year Price Chart -->
-    <h2>Bitcoin: Last 10 Years Closing Price</h2>
-    <canvas id="btcChart3650d"></canvas>
+
+
+      <canvas id="btcChartCombined"></canvas>
+    </div>
   </div>
 
   <script src="main.js"></script>

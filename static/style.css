@@ -116,6 +116,27 @@ tbody td:last-child {
 /* ==============================
    KPI Cards (Bitcoin Tab)
    ============================== */
+.kpi-wrapper {
+  border: 2px solid #FF8C00;
+  border-radius: 16px;
+  padding: 0 2rem;
+  background: #000;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 18px rgba(255,140,0,0.16);
+  position: relative;
+}
+
+.kpi-title {
+  color: white;
+  font-size: 1rem;
+  font-weight: normal;
+  margin-top: 1rem;   /* Try 1.2rem or whatever looks right */
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+  text-align: left;
+  text-shadow: 0 2px 12px rgba(255,140,0,0.10);
+}
+
 .kpi-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
@@ -138,10 +159,33 @@ tbody td:last-child {
   color: #FF8C00;
 }
 
+/* Last Updated for KPIs */
+#last-updated-container {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 1rem;
+  margin-top: -0.5rem;
+}
+
 /* ==============================
-   Bitcoin Charts
+   Unified Bitcoin Chart
    ============================== */
-#bitcoin canvas {
+.chart-panel {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.chart-label {
+  color: #FF8C00;
+  /*font-weight: bold;*/
+}
+#btcChartCombined {
   width: 100% !important;
   height: 300px;
   max-height: 300px;
@@ -151,18 +195,33 @@ tbody td:last-child {
   margin-bottom: 1.5rem;
   box-sizing: border-box;
 }
-
-/* Chart headings matching tab font */
-#bitcoin h2 {
-  color: white;
-  font-size: 1rem;
-  font-weight: bold;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-/* Match chart font */
 canvas {
   font-size: 16px !important;
   font-family: inherit !important;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.tf-btn {
+  background: #111;
+  color: #FF8C00;
+  border: 2px solid #FF8C00;
+  border-radius: 6px;
+  /*font-weight: bold;*/
+  font-size: 1rem;
+  padding: 0.3em 1.1em;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s, border 0.13s;
+}
+.tf-btn.active, .tf-btn:focus {
+  background: #FF8C00;
+  color: #111;
+  outline: none;
+}
+.tf-btn:hover:not(.active) {
+  background: #18120b;
 }
