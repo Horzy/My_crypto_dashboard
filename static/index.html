@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Crypto Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <nav class="tabs">
+    <ul>
+      <li class="active"><a href="#" data-tab="market">Crypto Market</a></li>
+      <li><a href="#" data-tab="bitcoin">Bitcoin</a></li>
+      <li><a href="#" data-tab="news">News</a></li>
+      <li><a href="#" data-tab="settings">Settings</a></li>
+    </ul>
+  </nav>
+
+  <br/>
+
+  <!-- Market Tab -->
+  <div id="market" class="container tab-content">
+    <table id="crypto-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Symbol</th>
+          <th>Price (USD)</th>
+          <th>Market Cap (USD)</th>
+          <th>1 h Change (%)</th>
+          <th>24 h Change (%)</th>
+          <th>7 d Change (%)</th>
+          <th>30 d Change (%)</th>
+          <th>% of Market</th>
+          <th>Last Updated</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Bitcoin Tab -->
+  <div id="bitcoin" class="container tab-content" style="display:none;">
+    <!-- KPI Cards -->
+    <div class="kpi-cards">
+      <div class="card"><div class="label">Price</div><div id="kpi-price"></div></div>
+      <div class="card"><div class="label">24 h Change</div><div id="kpi-change"></div></div>
+      <div class="card"><div class="label">Market Cap</div><div id="kpi-mcap"></div></div>
+      <div class="card"><div class="label">24 h Volume</div><div id="kpi-vol"></div></div>
+      <div class="card"><div class="label">Dominance</div><div id="kpi-dom"></div></div>
+      <div class="card"><div class="label">Circulating Supply</div><div id="kpi-supply"></div></div>
+      <div class="card"><div class="label">Max Supply</div><div id="kpi-max-supply"></div></div>
+      <div class="card"><div class="label">Last Updated</div><div id="kpi-last-updated"></div></div>
+    </div>
+
+    <!-- 30-Day Price Chart -->
+    <h2>Bitcoin: Last 30 Days Closing Price</h2>
+    <canvas id="btcChart30d"></canvas>
+
+    <!-- 90-Day Price Chart -->
+    <h2>Bitcoin: Last 90 Days Closing Price</h2>
+    <canvas id="btcChart90d"></canvas>
+
+    <!-- 12-Month Price Chart -->
+    <h2>Bitcoin: Last 12 Months Closing Price</h2>
+    <canvas id="btcChart365d"></canvas>
+
+    <!-- 10-Year Price Chart -->
+    <h2>Bitcoin: Last 10 Years Closing Price</h2>
+    <canvas id="btcChart3650d"></canvas>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
