@@ -9,6 +9,7 @@ It provides a live view of the crypto market, focusing on the top 50 cryptocurre
 
 ## Project Structure
 
+```
 project_root/
 ├── app.py # Main Flask backend
 ├── fetch_and_store.py # Data fetching/storage logic
@@ -21,7 +22,7 @@ project_root/
 │ └── index.html # Single-page app UI
 ├── adhoc_backfill_btc.py # Utility: backfill BTC daily closes
 └── adhoc_db_test.py # Utility: DB test script
-
+```
 
 
 ---
