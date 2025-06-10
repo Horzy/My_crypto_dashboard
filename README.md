@@ -8,14 +8,16 @@ This project is a web-based cryptocurrency dashboard built with Python (Flask) a
 project_root/
 ├── app.py
 ├── fetch_and_store.py
-├── crypto_data.db
+├── crypto.db
 ├── requirements.txt
+├── .env
+├── adhoc_backfill_btc.py
+├── adhoc_db_test.py
 ├── static/
-│   ├── style.css
-│   └── main.js
-└── templates/
-    ├── index.html
-    └── bitcoin.html
+    ├── style.css
+    ├── main.js
+    └── index.html
+
 ```
 
 ## File Descriptions
