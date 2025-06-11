@@ -237,3 +237,26 @@ canvas {
 .tf-btn:hover:not(.active) {
   background: #18120b;
 }
+
+/* Align columns for proxies tables */
+#proxies table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#proxies table th, #proxies table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Set specific width per column */
+#proxies table th:nth-child(1), #proxies table td:nth-child(1) { width: 8ch; }    /* Ticker */
+#proxies table th:nth-child(2), #proxies table td:nth-child(2) { width: 18ch; }   /* Name */
+#proxies table th:nth-child(3), #proxies table td:nth-child(3) { width: 8ch; }    /* Country */
+#proxies table th:nth-child(4), #proxies table td:nth-child(4) { width: 10ch; }   /* BTC */
+#proxies table th:nth-child(5), #proxies table td:nth-child(5) { width: 13ch; }   /* USD Value */
+#proxies table th:nth-child(6), #proxies table td:nth-child(6) { width: 9ch; }    /* % of 21M */
+#proxies table th:nth-child(7), #proxies table td:nth-child(7) { width: 8ch; }    /* Filing */
+#proxies table th:nth-child(8), #proxies table td:nth-child(8) { width: 10ch; }   /* Price */
+#proxies table th:nth-child(9), #proxies table td:nth-child(9) { width: 18ch; }   /* Last Updated */

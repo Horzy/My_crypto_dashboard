@@ -23,6 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (bitcoinInterval) clearInterval(bitcoinInterval);
         bitcoinInterval = setInterval(loadBitcoin, 60_000);
       }
+      if (a.dataset.tab === "proxies") {
+        loadProxies();
+        if (bitcoinInterval) {
+          clearInterval(bitcoinInterval);
+          bitcoinInterval = null;
+        }
+      }
     });
   });
 
@@ -58,6 +65,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 function formatPrice(val) {
+  if (val === null || val === undefined) return "-";
   if (val > 1000) {
     return val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   } else if (val >= 1) {
@@ -68,6 +76,7 @@ function formatPrice(val) {
 }
 
 function formatMarketCap(val) {
+  if (val === null || val === undefined) return "-";
   return val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
@@ -107,6 +116,9 @@ let btcHistoryCache = null;
 
 async function loadBitcoin() {
   const k = await (await fetch("/api/bitcoin/kpis")).json();
+
+  window.btcATH = k.ath;  // Save ATH for the chart
+
   document.getElementById("kpi-price").textContent         = `$${k.price.toLocaleString()}`;
   document.getElementById("kpi-change").textContent        = `${k.change_24h.toFixed(2)}%`;
   document.getElementById("kpi-mcap").textContent          = `$${k.market_cap.toLocaleString()}`;
@@ -139,17 +151,95 @@ function renderCombinedChart() {
 
   const labels = dataSlice.map(pt => pt.date);
   const prices = dataSlice.map(pt => pt.price);
-  const ctx = document.getElementById("btcChartCombined").getContext("2d");
 
+  // Debug
+  console.log("window.btcATH =", window.btcATH, typeof window.btcATH);
+
+  const ath = Number(window.btcATH); // ensure number
+
+  // Register annotation plugin if not already done
+  if (window.Chart && window.Chart.registry && window['chartjs-plugin-annotation']) {
+    Chart.register(window['chartjs-plugin-annotation']);
+  }
+
+  const ctx = document.getElementById("btcChartCombined").getContext("2d");
   if (btcCharts.combined) btcCharts.combined.destroy();
 
   btcCharts.combined = new Chart(ctx, {
     type: 'line',
     data: { labels, datasets: [{ data: prices, fill: false, tension: 0.1 }] },
     options: {
-      scales: { x: { ticks: { maxTicksLimit: 10 } }, y: { beginAtZero: false } },
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        annotation: {
+  annotations: {
+    athLine: {
+      type: 'line',
+      yMin: ath,
+      yMax: ath,
+      borderColor: '#ffdf00',
+      borderWidth: 1, 
+      borderDash: [6, 6],
+      label: {
+        display: true,
+content: "ATH: " + ath.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}),
+        position: 'start',
+        backgroundColor: '#222',
+        color: '#ffdf00',
+        font: {  size: 11 }
+      }
+    }
+  }
+}
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 10 } },
+        y: { beginAtZero: false }
+      },
       elements: { point: { radius: 2 } }
     }
   });
+}
+
+
+// ===== Proxies Tab =====
+async function loadProxies() {
+  const res = await fetch("/api/proxies");
+  const data = await res.json();
+
+  // Find latest timestamp for display
+  let latest = null;
+  data.forEach(row => {
+    if (row.last_updated && (!latest || row.last_updated > latest)) latest = row.last_updated;
+  });
+ 
+   // Group by type
+  const treasuries = data.filter(d => d.type === "treasury");
+  const etfs = data.filter(d => d.type === "etf");
+  const miners = data.filter(d => d.type === "miner");
+
+  function renderRows(arr) {
+    return arr.map(d => `
+      <tr>
+        <td>${d.ticker}</td>
+        <td>${d.name}</td>
+        <td>
+          ${d.country_flag ? `<img src="${d.country_flag}" alt="" title="${d.country}" style="width:22px;vertical-align:middle;margin-right:4px;">` : ""}
+          ${d.country ? d.country : ""}
+        </td>
+        <td>${d.btc ? d.btc.toLocaleString() : "-"}</td>
+        <td>$${d.usd ? d.usd.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0}) : "-"}</td>
+        <td>${d.pct_21m ? d.pct_21m : "-"}</td>
+        <td>
+          ${d.filing_link ? `<a href="${d.filing_link}" target="_blank" rel="noopener" style="color:#2979ff;">Link</a>` : ""}
+        </td>
+        <td>${d.price !== null ? "$" + d.price : "-"}</td>
+        <td>${d.last_updated ? new Date(d.last_updated).toLocaleString(undefined, { timeZoneName: 'short' }) : ""}</td>
+      </tr>
+    `).join('');
+  }
+
+  document.querySelector("#treasuries-table tbody").innerHTML = renderRows(treasuries);
+  document.querySelector("#etfs-table tbody").innerHTML = renderRows(etfs);
+  document.querySelector("#miners-table tbody").innerHTML = renderRows(miners);
 }

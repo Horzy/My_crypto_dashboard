@@ -1,0 +1,11 @@
+{
+  "MSTR:NADQ": { "name": "MicroStrategy", "type": "treasury", "notes": "" },
+  "IBIT:NASDAQ": { "name": "BlackRock iShares Bitcoin ETF", "type": "etf", "notes": "" },
+  "MARA:NADQ": { "name": "Marathon Digital", "type": "miner", "notes": "" },
+  "RIOT:NADQ": { "name": "Riot Platforms", "type": "miner", "notes": "" },
+  "GME:NYSE": { "name": "GameStop Corp.", "type": "treasury", "notes": "" },
+  "FBTC:CBOE": { "name": "Fidelity Wise Origin Bitcoin Fund", "type": "etf", "notes": "" },
+  "GBTC:NYSE": { "name": "Grayscale Bitcoin Trust", "type": "etf", "notes": "" },
+  "XBTE:NADQ": { "name": "CoinShares / XBT Provider", "type": "etf", "notes": "" },
+  "ARKB:CBOE": { "name": "ARK 21Shares Bitcoin ETF", "type": "etf", "notes": "" }
+}
