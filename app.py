@@ -31,6 +31,9 @@ BTC_KPIS_CACHE = {}
 BTC_KPIS_TS    = 0
 KPIS_TTL       = 5 * 60  # 5 minutes
 
+# Data staleness window for top coins
+DATA_TTL = 5 * 60  # 5 minutes in seconds
+
 # Resilient requests session
 session = requests.Session()
 session.headers.update({
@@ -68,8 +71,30 @@ def scheduled_fetch():
     except Exception as e:
         app.logger.error("Unexpected error in scheduled_fetch", exc_info=e)
 
+def data_is_stale():
+    conn = sqlite3.connect(DB_PATH)
+    row = conn.execute("SELECT MAX(last_updated) FROM coins").fetchone()
+    conn.close()
+    if not row or not row[0]:
+        return True
+    try:
+        last_updated_ts = datetime.fromisoformat(row[0]).timestamp()
+    except Exception:
+        last_updated_ts = 0
+    return (time.time() - last_updated_ts) > DATA_TTL
+
 @app.route("/api/cryptos")
 def get_cryptos():
+    # If data is stale, update it before serving!
+    if data_is_stale():
+        try:
+            total = fetch_global_marketcap()
+            coins = fetch_top_coins()
+            if total is not None:
+                upsert_coins(coins, total)
+        except Exception as e:
+            app.logger.error("Error refreshing coin data", exc_info=e)
+    # Now serve from the DB as before
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
         SELECT id, symbol, name, image,
