@@ -78,6 +78,7 @@ def data_is_stale():
     if not row or not row[0]:
         return True
     try:
+        # Parse as UTC always
         last_updated_ts = datetime.fromisoformat(row[0]).timestamp()
     except Exception:
         last_updated_ts = 0
@@ -85,7 +86,6 @@ def data_is_stale():
 
 @app.route("/api/cryptos")
 def get_cryptos():
-    # If data is stale, update it before serving!
     if data_is_stale():
         try:
             total = fetch_global_marketcap()
@@ -94,7 +94,7 @@ def get_cryptos():
                 upsert_coins(coins, total)
         except Exception as e:
             app.logger.error("Error refreshing coin data", exc_info=e)
-    # Now serve from the DB as before
+    # Serve from DB as before
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute("""
         SELECT id, symbol, name, image,
@@ -125,7 +125,6 @@ def btc_kpis():
     global BTC_KPIS_CACHE, BTC_KPIS_TS
     now = time.time()
     if BTC_KPIS_CACHE and now - BTC_KPIS_TS < KPIS_TTL:
-        # Return last_updated as ISO format with timezone info
         BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(BTC_KPIS_TS, tz=timezone.utc).isoformat()
         return jsonify(BTC_KPIS_CACHE)
 
@@ -138,7 +137,6 @@ def btc_kpis():
       "price_change_percentage": "1h,24h,7d,30d"
     }
     try:
-        # Get basic market data from /coins/markets
         resp = session.get(API_URL, params=params)
         resp.raise_for_status()
         d = resp.json()[0]
@@ -146,7 +144,6 @@ def btc_kpis():
         total = g.get("total_market_cap", {}).get("usd", 0)
         dom = (d["market_cap"] / total * 100) if total else 0
 
-        # Get ATH from /coins/bitcoin
         btc_info = session.get(
             "https://api.coingecko.com/api/v3/coins/bitcoin",
             params={
@@ -175,10 +172,7 @@ def btc_kpis():
         perc_from_ath = ((BTC_KPIS_CACHE["price"] - BTC_KPIS_CACHE["ath"]) / BTC_KPIS_CACHE["ath"]) * 100
         BTC_KPIS_CACHE["from_ath_pct"] = perc_from_ath
         BTC_KPIS_TS = now
-        # Return last_updated as ISO format with timezone info
         BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(now, tz=timezone.utc).isoformat()
-
-        # Upsert latest BTC close to btc_history
         upsert_btc_today_close(d["current_price"])
 
     except Exception as e:

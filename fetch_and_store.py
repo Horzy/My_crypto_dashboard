@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import requests
-from datetime import date
+from datetime import date, datetime, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -61,6 +61,7 @@ def fetch_top_coins():
 def upsert_coins(coins, total_mcap):
     conn = init_db()
     cur = conn.cursor()
+    now_iso = datetime.now(timezone.utc).isoformat()
     for c in coins:
         share = (c["market_cap"] / total_mcap * 100) if total_mcap else 0.0
         cur.execute("""
@@ -93,7 +94,7 @@ def upsert_coins(coins, total_mcap):
             c.get("price_change_percentage_7d_in_currency", 0.0),
             c.get("price_change_percentage_30d_in_currency", 0.0),
             share,
-            c["last_updated"],
+            now_iso,  # Always UTC ISO with offset
         ))
     conn.commit()
     conn.close()
