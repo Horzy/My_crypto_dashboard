@@ -84,7 +84,7 @@ async function loadMarket() {
       <tr class="${isBTC ? 'bitcoin-row' : ''}">
         <td>${i + 1}</td>
         <td>
-          <img src="${c.image}" alt="${c.symbol} icon" style="width:24px;height:24px;vertical-align:middle;"/>
+          <img src="${c.image}" alt="${c.symbol} icon"/>
         </td>
         <td>${c.name}</td>
         <td>${c.symbol.toUpperCase()}</td>
@@ -98,7 +98,7 @@ async function loadMarket() {
           <span>${c.market_cap_share.toFixed(2)}%</span>
           <div class="bar"><div class="fill" style="width:${c.market_cap_share}%"></div></div>
         </td>
-        <td>${new Date(c.last_updated).toLocaleString()}</td>
+        <td>${new Date(c.last_updated).toLocaleString(undefined, { timeZoneName: 'short' })}</td>
       </tr>`;
   }).join('');
 }
@@ -118,8 +118,11 @@ async function loadBitcoin() {
   document.getElementById("kpi-from-ath-pct").textContent  = `${k.from_ath_pct.toFixed(2)}%`;
   document.getElementById("kpi-high24h").textContent       = `$${k.high_24h.toLocaleString()}`;
   document.getElementById("kpi-low24h").textContent        = `$${k.low_24h.toLocaleString()}`;
-  document.getElementById("kpi-last-updated").textContent  = k.last_updated;
-
+  // Now show last_updated in local timezone with label
+  document.getElementById("kpi-last-updated").textContent  =
+    k.last_updated
+      ? new Date(k.last_updated).toLocaleString(undefined, { timeZoneName: 'short' })
+      : '';
   btcHistoryCache = await (await fetch("/api/bitcoin/history")).json();
   renderCombinedChart();
 }

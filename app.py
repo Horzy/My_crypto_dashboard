@@ -2,7 +2,7 @@ import os
 import sqlite3
 import atexit
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask, jsonify, send_from_directory
 from flask_compress import Compress
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -125,7 +125,8 @@ def btc_kpis():
     global BTC_KPIS_CACHE, BTC_KPIS_TS
     now = time.time()
     if BTC_KPIS_CACHE and now - BTC_KPIS_TS < KPIS_TTL:
-        BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(BTC_KPIS_TS).strftime("%Y-%m-%d %H:%M:%S")
+        # Return last_updated as ISO format with timezone info
+        BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(BTC_KPIS_TS, tz=timezone.utc).isoformat()
         return jsonify(BTC_KPIS_CACHE)
 
     params = {
@@ -174,7 +175,8 @@ def btc_kpis():
         perc_from_ath = ((BTC_KPIS_CACHE["price"] - BTC_KPIS_CACHE["ath"]) / BTC_KPIS_CACHE["ath"]) * 100
         BTC_KPIS_CACHE["from_ath_pct"] = perc_from_ath
         BTC_KPIS_TS = now
-        BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(now).strftime("%Y-%m-%d %H:%M:%S")
+        # Return last_updated as ISO format with timezone info
+        BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(now, tz=timezone.utc).isoformat()
 
         # Upsert latest BTC close to btc_history
         upsert_btc_today_close(d["current_price"])
@@ -182,7 +184,7 @@ def btc_kpis():
     except Exception as e:
         app.logger.error("Error fetching KPIs", exc_info=e)
         if BTC_KPIS_CACHE:
-            BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(BTC_KPIS_TS).strftime("%Y-%m-%d %H:%M:%S")
+            BTC_KPIS_CACHE["last_updated"] = datetime.fromtimestamp(BTC_KPIS_TS, tz=timezone.utc).isoformat()
 
     return jsonify(BTC_KPIS_CACHE or {})
 
